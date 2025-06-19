@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this programe.  If not, see <http://www.gnu.org/licenses/>.
-import pkg_resources
 from django.templatetags import i18n
 
 from django_l10n_extensions.po_utils import get_po_entry
@@ -22,7 +21,16 @@ from .utils import html_escape
 
 def get_version(svn=False):
     """Returns the version as a human-format string."""
-    v = pkg_resources.require("django_l10n_extensions")[0].version
+    try:
+        from importlib.metadata import version, PackageNotFoundError
+    except ImportError:
+        from importlib_metadata import version, PackageNotFoundError  # type: ignore
+
+    try:
+        v = version("django_l10n_extensions")
+    except PackageNotFoundError:
+        v = "unknown"
+
     if svn:
         from django.utils.version import get_svn_revision
         import os
